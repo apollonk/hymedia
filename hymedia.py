@@ -1,7 +1,11 @@
 #!/bin/env python3
+from __future__ import print_function
 import os,sys
 import magic
 import ffmpeg
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 def get_info(inputFile):
   try:
@@ -36,6 +40,6 @@ for folder, subs, files in os.walk('vault/Downloads'):
                     print(stream_info(stream))
                 print()
             else:
-                print("ffprobe FAIL on %s" % filename)
+                eprint("ffprobe FAIL on %s" % filename)
         else:
-            print("FAIL on %s" % filename)
+            eprint("FAIL on %s" % filename)
