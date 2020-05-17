@@ -3,6 +3,9 @@ from __future__ import print_function
 import os,sys
 import magic
 import ffmpeg
+import argparse
+
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -27,8 +30,17 @@ def stream_info(stream):
         '...'
         )
 
+parser = argparse.ArgumentParser(description='HyMedia')
+parser.add_argument('directory', type=str,
+        help='the directory to recursively examine')
+args = parser.parse_args()
+if not os.path.isdir(args.directory):
+    eprint("%s is not a directory!" % args.directory)
+    parser.print_help()
+    sys.exit(1)
+
 mime = magic.Magic(mime=True)
-for folder, subs, files in os.walk('vault/Downloads'):
+for folder, subs, files in os.walk(args.directory):
     for fn in files:
         filename = "%s/%s" % ( folder,fn )
         if os.path.isfile(filename) and \
