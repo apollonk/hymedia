@@ -43,6 +43,7 @@ class MediaFile:
             self.readable = True
             self.info = self.__get_info()
             if self.info is not None:
+                self.parseable = True
                 for stream in self.info['streams']:
                     self.streams.append( MediaStream(stream) )
             else:
@@ -50,11 +51,12 @@ class MediaFile:
                 eprint("ffprobe FAIL on %s" % filename)
         else:
             # TODO: raise an exception instead
-            eprint("FAIL on %s" % filename)
+            eprint("FAIL on %s: Is not a mime type we can handle (%s)" % (
+                filename, mime.from_file(filename) ))
 
     def get_info(self):
         return "Filename: %s -- Streams:\n%s" % ( self.filename,
-            '\n\n'.join( [stream.info() for stream in self.streams] )
+            '\n'.join( [stream.info() for stream in self.streams] )
             )
 
     def __get_info(self):
@@ -64,6 +66,9 @@ class MediaFile:
             #print(e.stderr)
             return None
         return probe
+
+    def is_parseable(self):
+        return self.parseable
 
 
 if __name__ == "__main__":
@@ -81,10 +86,13 @@ if __name__ == "__main__":
     for folder, subs, files in os.walk(args.directory):
         for fn in files:
             try:
-                mf = MediaFile("%s/%s" % ( folder,fn ))
+                mf = MediaFile("%s/%s" % ( folder, fn ))
                 #print(mf.get_info())
-                medalist.append(mf)
+                if mf.is_parseable():
+                    medialist.append(mf)
             except:
                 pass
     for media in medialist:
+        print(media.filename)
         print(media.get_info())
+        #pass
