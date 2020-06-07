@@ -19,6 +19,7 @@ class MediaStream:
             'tags' in stream.keys() and
             'language' in stream['tags'].keys()) else '???'
         self.codec_name = stream['codec_name'] if 'codec_name' in stream.keys() else '???'
+        self.error = ''
 
     def info(self):
         return "Stream %d - %s(%s): %s - %s" % (
@@ -38,6 +39,7 @@ class MediaFile:
         self.readable = False
         self.parseable = False
         self.filename = filename
+        mime = magic.Magic(mime=True)
         if os.path.isfile(filename) and \
           mime.from_file(filename).split('/')[0] == 'video':
             self.readable = True
@@ -51,8 +53,9 @@ class MediaFile:
                 eprint("ffprobe FAIL on %s" % filename)
         else:
             # TODO: raise an exception instead
-            eprint("FAIL on %s: Is not a mime type we can handle (%s)" % (
-                filename, mime.from_file(filename) ))
+            #eprint("FAIL on %s: Is not a mime type we can handle (%s)" % (
+            self.error = "FAIL on %s: Is not a mime type we can handle (%s)" % (
+                filename, mime.from_file(filename))
 
     def get_info(self):
         return "Filename: %s -- Streams:\n%s" % ( self.filename,
@@ -81,7 +84,6 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(1)
     
-    mime = magic.Magic(mime=True)
     medialist = []
     for folder, subs, files in os.walk(args.directory):
         for fn in files:
